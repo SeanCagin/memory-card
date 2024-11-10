@@ -23,4 +23,22 @@ function shuffle(array) {
   }
 }
 
-export { getRandomElement, shuffle };
+function cardHover(e) {
+  let offset = e.currentTarget.getBoundingClientRect();
+  let centerX = (offset.left + offset.right) / 2;
+  let centerY = (offset.top + offset.bottom) / 2;
+  let mouseX = e.clientX - centerX;
+  let mouseY = e.clientY - centerY;
+
+  e.currentTarget.style.transition = "transform 0.1s ease-out";
+  e.currentTarget.style.transformOrigin = "50% 50%";
+  e.currentTarget.style.transform = `rotateX(${mouseY * 0.05}deg)
+  rotateY(${mouseX * -0.05}deg) scale(1.1)`;
+  e.currentTarget.parentNode.style.perspective = "500px";
+}
+
+function cardReset(e) {
+  e.currentTarget.style.transition = "transform 0.5s ease-out";
+  e.currentTarget.style.transform = "";
+}
+export { getRandomElement, shuffle, cardHover, cardReset };

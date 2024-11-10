@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import {getRandomElement, shuffle} from "./utility.js";
-import logoSrc from "/logo.svg";
+import {getRandomElement, shuffle, cardHover, cardReset } from "./utility.js";
+import "./styles.css";
 
 const GAMESTATES = {
     STANDARD: 0,
@@ -33,8 +33,8 @@ const CHARACTERS = {
     "Mr. Maellard": "https://media1.tenor.com/m/nfOPbIZ4p3MAAAAd/wipe-tears-mr-maellard.gif",
     "Starla": "https://media1.tenor.com/m/pmP8DAGjfCUAAAAC/starla-on-the-glass-regular-show.gif",
     "Gary": "https://media1.tenor.com/m/EePFAMcNrO0AAAAd/regular-show-gary-regular-show.gif",
-    "Guardians of Eternal Youth": "https://media1.tenor.com/m/HEr7kmeYi5wAAAAd/regular-show.gif",
-    "Garett Bobby Furgeson": "https://media1.tenor.com/m/N2ncytySZLQAAAAd/regularshow-gbf.gif",
+    "Babies": "https://media1.tenor.com/m/HEr7kmeYi5wAAAAd/regular-show.gif",
+    "GBF": "https://media1.tenor.com/m/N2ncytySZLQAAAAd/regularshow-gbf.gif",
 }
 
 const EASY = 8;
@@ -54,9 +54,11 @@ const CARDS_HARD = CARDS_IMPOSSIBLE.slice(0, HARD);
 
 function Card({imgSrc, clickFunc, name}) {
     return (
-        <div className="card">
-            <img className="cardImg" onClick={() => {clickFunc(name)}} src={imgSrc} />
-            {name}
+        <div className="cardHolder">
+            <div className="card" onMouseMove={cardHover} onMouseLeave={cardReset} >
+                <div className="gifHolder"><img className="cardImg" onClick={() => {clickFunc(name)}} src={imgSrc} /></div>
+                <h2 className="charName">{name}</h2>
+            </div>
         </div>
     );
 }
@@ -72,7 +74,7 @@ function Page() {
 }
 
 function Gameboard({diffculty, numCardsShown, CARDS}) {
-    const [gameState, updateGameState] = useState(GAMESTATES.INTERMISSION);
+    const [gameState, updateGameState] = useState(GAMESTATES.STANDARD);
     const [usedCards, updateUsedCards] = useState([]);
     const unusedCards = CARDS.filter(card => {return usedCards.indexOf(card) == -1});
     let renderCards = [];
@@ -101,20 +103,37 @@ function Gameboard({diffculty, numCardsShown, CARDS}) {
     }
     shuffle(renderCards);
 
-
-    renderArray = renderCards.map((item) => <Card imgSrc={CHARACTERS[item]} clickFunc={clickFunc} name={item} key={item} />);
-    return (<div className="cardList">
-        {renderArray}
-    </div>);
+    if (gameState == GAMESTATES.STANDARD) {
+        renderArray = renderCards.map((item) => <Card imgSrc={CHARACTERS[item]} clickFunc={clickFunc} name={item} key={item} />);
+        return (<div className="cardList">
+            {renderArray}
+        </div>);
+    } else if (gameState == GAMESTATES.INTERMISSION) {
+        let intermissionArray = renderCards.map((item, index) => <IntermissionCard key={index} />);
+        return <div className="cardList">
+            {intermissionArray}
+        </div>;
+    } else {
+        return <LossScreen />;
+    }
 }
 
 function Controls() { // Score and Best score
-    return <div>
-        Score: 3
-        Best Score: 5
-    </div>
+    return (<div className="score">
+        <div className="currScore">Score: 3</div>
+        <div className="bestScore">Best Score: 5</div>
+    </div>);
 }
 
+function LossScreen() {
+    return (<div>You Lost.</div>);
+}
+
+function IntermissionCard() {
+    return (
+        <div className="cardHolder"><div className="card" onMouseMove={cardHover} onMouseLeave={cardReset}></div></div>
+    );
+}
 
 
 export default Page;
