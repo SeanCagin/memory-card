@@ -48,6 +48,12 @@ table {
 	border-spacing: 0;
 }
 
+:root {
+  background-image: url("../public/the_park.webp");
+  --mouse-position: 0 0;
+  --strength: 0;
+}
+
 .page {
   width: 100vw;
 }
@@ -61,11 +67,23 @@ table {
 }
 
 .card {
+  position: relative;
   padding: 0.1px; /*prevents margin collapsing*/
   width: 270px;
   height: 370px;
   background-image: url("../public/background.jpg");
   background-size: cover;
+  border-radius: 10px;
+}
+
+.card:hover::after {
+  position: absolute;
+  bottom: 0;  
+  height: 100%;
+  width: 100%;
+  content: "";
+  background: radial-gradient(circle at var(--mouse-position), rgba(255, 255, 255, var(--strength)), rgba(255, 255, 255, 0.0));
+  pointer-events: none; /* so the text is still selectable */
   border-radius: 10px;
 }
 
@@ -84,6 +102,7 @@ table {
   width: 100%;
   height: 100%;
   border-radius: 10px;
+  /* border: 2px solid black; */
 }
 
 .charName {
@@ -92,6 +111,7 @@ table {
   width: fit-content;
   font-size: 24px;
   font-weight: bolder;
+  /* color: black; */
 }
 
 .score {

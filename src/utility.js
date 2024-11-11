@@ -24,17 +24,27 @@ function shuffle(array) {
 }
 
 function cardHover(e) {
+  let root = document.querySelector(":root");
   let offset = e.currentTarget.getBoundingClientRect();
   let centerX = (offset.left + offset.right) / 2;
   let centerY = (offset.top + offset.bottom) / 2;
   let mouseX = e.clientX - centerX;
   let mouseY = e.clientY - centerY;
+  let mouseXPercentage =
+    (100 * (e.clientX - offset.left)) / (offset.right - offset.left);
+  let mouseYPercentage =
+    (100 * (e.clientY - offset.top)) / (offset.bottom - offset.top);
+  let strength = (mouseYPercentage - 50) / 50;
+  let mousePosition = `${mouseXPercentage}% ${100}%`;
+  console.log(mousePosition);
 
-  e.currentTarget.style.transition = "transform 0.1s ease-out";
+  root.style.setProperty("--mouse-position", mousePosition);
+  root.style.setProperty("--strength", strength);
+  e.currentTarget.style.transition = "transform 0.2s ease-out";
   e.currentTarget.style.transformOrigin = "50% 50%";
-  e.currentTarget.style.transform = `rotateX(${mouseY * 0.05}deg)
-  rotateY(${mouseX * -0.05}deg) scale(1.1)`;
-  e.currentTarget.parentNode.style.perspective = "500px";
+  e.currentTarget.style.transform = `rotateX(${mouseY * 0.1}deg)
+  rotateY(${mouseX * -0.1}deg) scale(1.1)`;
+  e.currentTarget.parentNode.style.perspective = "1600px";
 }
 
 function cardReset(e) {
