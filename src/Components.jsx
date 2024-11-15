@@ -25,10 +25,10 @@ const MODES = {
 }
 
 const BESTSCORE = {
-    [MODES["EASY"]]: 0,
-    [MODES["NORMAL"]]: 0,
-    [MODES["HARD"]]: 0,
-    [MODES["IMPOSSIBLE"]]: 0,
+    [MODES["EASY"]]: localStorage.getItem(MODES["EASY"]) || 0,
+    [MODES["NORMAL"]]: localStorage.getItem(MODES["NORMAL"]) || 0,
+    [MODES["HARD"]]: localStorage.getItem(MODES["HARD"]) || 0,
+    [MODES["IMPOSSIBLE"]]: localStorage.getItem(MODES["IMPOSSIBLE"]) || 0,
 }
 
 const SRCMAP = {};
@@ -93,21 +93,17 @@ function diffToCardset(difficulty) {
 }
 
 function Page() {
-    const [opening, {sound: openingSettings}] = useSound(openingSound);
-    const [tick, {sound: tickSettings}] = useSound(tickSound);
-    const [starlightSoundObj, {sound: starlightSoundSettings}] = useSound(starlightSound, { volume: 0.1, interrupt: true, loop: true});
-    const [partySoundObj, {sound: partySoundSettings}] = useSound(partySound, { volume: 0.05, interrupt: true, loop: true });
-    const [summerSoundObj, {sound: summerSoundSettings}] = useSound(summerSound, { volume: 0.1, interrupt: true, loop: true });
-    const [synthSoundObj, {sound: synthSoundSettings}] = useSound(synthSound, { volume: 0.1, interrupt: true, loop: true });
+    const [opening, {sound: openingSettings, stop: stopOpening}] = useSound(openingSound);
+    const [tick, {sound: tickSettings, stop: stopTick}] = useSound(tickSound);
+    const [starlightSoundObj, {sound: starlightSoundSettings, stop: stopStarlight}] = useSound(starlightSound, { volume: 0.1, interrupt: true, loop: true});
+    const [partySoundObj, {sound: partySoundSettings, stop: stopParty}] = useSound(partySound, { volume: 0.05, interrupt: true, loop: true });
+    const [summerSoundObj, {sound: summerSoundSettings, stop: stopSummer}] = useSound(summerSound, { volume: 0.1, interrupt: true, loop: true });
+    const [synthSoundObj, {sound: synthSoundSettings, stop: stopSynth}] = useSound(synthSound, { volume: 0.1, interrupt: true, loop: true });
     const [pregameState, changePregame] = useState(0);
     const [difficulty, changeDifficulty] = useState(MODES.EASY);
     const [cardCount, changeCardCount] = useState(4);
     const [intState, setIntState] = useState(false);
-    const [isMute, setMute] = useState(false);
-
-
-
-
+    const [isMute, setMute] = useState((localStorage.getItem("mute") == "true") || 0);
     useEffect(() => {
         const soundArr = [[openingSettings, 1], [tickSettings, 1], [starlightSoundSettings, 0.1], [partySoundSettings, 0.05], [summerSoundSettings, 0.1], [synthSoundSettings, 0.1]];
         soundArr.forEach(([soundObj, volume]) => {
@@ -115,7 +111,14 @@ function Page() {
             soundObj.volume(isMute ? 0 : volume);
           }
         });
-      }, [isMute, openingSettings, tickSettings, starlightSoundSettings, partySoundSettings, summerSoundSettings, synthSoundSettings]);
+    }, [isMute, openingSettings, tickSettings, starlightSoundSettings, partySoundSettings, summerSoundSettings, synthSoundSettings]);
+
+    function muteAllSounds() {
+        const stopArr = [stopOpening, stopTick, stopStarlight, stopSummer, stopParty, stopSynth];
+        stopArr.forEach((stop) => {
+            stop();
+        });
+    }
 
     useEffect(() => {
         if (pregameState == 1) {
@@ -134,41 +137,54 @@ function Page() {
     if (pregameState == 0) {
         return (<>
             <StartScreen pregameState={pregameState} changePregame={changePregame} />;
-            <Mute isMute={isMute} setMute={setMute} />
+            <Mute isMute={isMute} setMute={setMute} tick={tick} />
         </>);
     } else if (pregameState == 1) {
         return (<>
             <RulesScreen text={`Don't click the same card twice`} />
-            <Mute isMute={isMute} setMute={setMute} />
+            <Mute isMute={isMute} setMute={setMute} tick={tick} />
         </>);
     } else if (pregameState == 2) {
         return (<>
             <ChooseDifficulty changeDifficulty={changeDifficulty} changePregame={changePregame} pregameState={pregameState} on={!intState} />
-            <Mute isMute={isMute} setMute={setMute} />
+            <Mute isMute={isMute} setMute={setMute} tick={tick} />
         </>);
     } else if (pregameState == 3) { 
         return (<>
             <ChooseCardCount changeCardCount={changeCardCount} changePregame={changePregame} pregameState={pregameState} on={!intState} />
-            <Mute isMute={isMute} setMute={setMute} />
+            <Mute isMute={isMute} setMute={setMute} tick={tick} />
         </>);
-    } /* else if (pregameState == 2) {
-        return <div></div>;
-    } */
-    return (<><Game 
+    } else if (pregameState == 4) {
+        return (<><Game 
             difficulty={difficulty} 
             numCardsShown={cardCount} 
             easySong={summerSoundObj} 
             mediumSong={partySoundObj} 
             hardSong={starlightSoundObj}
             impossibleSong={synthSoundObj}
-            clickSound={tick} />
-        <Mute isMute={isMute} setMute={setMute} />
+            clickSound={tick}
+            changePregame={changePregame}
+            pregameState={pregameState} />
+        <Mute isMute={isMute} setMute={setMute} tick={tick} />
         </>)
+    } else if (pregameState == 5) {
+        return (<><EndScreen text={`YOU'RE FIRED!`} muteFunc={muteAllSounds} changePregame={changePregame} tick={tick} />
+            <Mute isMute={isMute} setMute={setMute} tick={tick} /></>
+        );
+    } else if (pregameState == 6) {
+        return (<><EndScreen text={`Wooooooooooooooaaaaaaaaaaaaah!`} muteFunc={muteAllSounds} changePregame={changePregame} tick={tick} />
+            <Mute isMute={isMute} setMute={setMute} tick={tick} /></>
+        );
+    }
 }
 
-function Mute({isMute, setMute}) {
+function Mute({isMute, setMute, tick}) {
     return (<div className="mute">
-        <img src={isMute ? muteImg : soundImg} className="soundImg" onClick={() => {setMute(!isMute)}} />
+        <img src={isMute ? muteImg : soundImg} className="soundImg" onClick={() => {
+            setMute(!isMute)
+            localStorage.setItem("mute", !isMute);
+            tick();
+        }} />
     </div>);
 }
 
@@ -181,11 +197,27 @@ function StartScreen({changePregame, pregameState}) {
         </div>);
 }
 
-function RulesScreen({text}) {
-    return (<div className="settings"><div className="settingsHeader">{text}</div></div>);
+function EndScreen({text, changePregame, muteFunc, tick}) {
+    function updateGame(state) {
+        if (state == 0) {
+            setTimeout(tick, 100);
+        }
+        changePregame(state);
+        muteFunc();
+    }
+    return (<div className="settings">
+        <h1 className="settingsHeader">{text}</h1>
+        <div className="settingOpts">
+            <div className="settingOpt" onClick={() => updateGame(2)}>Play Again</div>
+            <div className="settingOpt" onClick={() => updateGame(0)}>Title screen</div>
+        </div>
+    </div>);
 }
 
 
+function RulesScreen({text}) {
+    return (<div className="settings"><div className="settingsHeader">{text}</div></div>);
+}
 
 function ChooseDifficulty({changeDifficulty, changePregame, pregameState, on}) {
     function chooseMode(mode) {
@@ -227,7 +259,7 @@ function ChooseCardCount({changeCardCount, changePregame, pregameState, on}) {
 }
 
 
-function Game({CARDS, difficulty, numCardsShown, easySong, mediumSong, hardSong, impossibleSong, clickSound}) {
+function Game({CARDS, difficulty, numCardsShown, easySong, mediumSong, hardSong, impossibleSong, clickSound, changePregame, pregameState}) {
     const [loading, setLoading] = useState(true);
     useEffect(() => {
         async function loadImages() {
@@ -270,7 +302,7 @@ function Game({CARDS, difficulty, numCardsShown, easySong, mediumSong, hardSong,
     if (!loading) {
         return (
             <div className="page">
-                <Gameboard CARDS={CARDS} numCardsShown={numCardsShown} difficulty={difficulty} clickSound={clickSound} />
+                <Gameboard CARDS={CARDS} numCardsShown={numCardsShown} difficulty={difficulty} clickSound={clickSound} changePregame={changePregame} pregameState={pregameState}/>
             </div>
         );
     } else {
@@ -278,18 +310,15 @@ function Game({CARDS, difficulty, numCardsShown, easySong, mediumSong, hardSong,
     }
 }
 
-function Gameboard({difficulty, numCardsShown, clickSound}) {
+function Gameboard({difficulty, numCardsShown, clickSound, pregameState, changePregame}) {
     const CARDS = diffToCardset(difficulty);
     const [usedCards, updateUsedCards] = useState([]);
-    const [lost, setLost] = useState(false);
     const [gameState, updateGameState] = useState(GAMESTATES.STANDARD);
     const [cardState, updateCardState] = useState([]);
 
     const unusedCards = CARDS.filter(card => {return usedCards.indexOf(card) == -1});
     const score = usedCards.length;
-    if (score > BESTSCORE[difficulty]) {
-        BESTSCORE[difficulty] = score;
-    }
+    updateBest(score, difficulty);
 
     useEffect(() => {
         if (score == 0) {
@@ -317,35 +346,39 @@ function Gameboard({difficulty, numCardsShown, clickSound}) {
     }
 
     function clickFunc(card) {
-        clickSound();
         if (usedCards.indexOf(card) == -1) { // user clicked an unused card.
+            if (score != CARDS.length - 1) {
+                clickSound();
+            } else {
+                updateBest(score + 1, difficulty);
+                if ((localStorage.getItem(difficulty) || 0) < BESTSCORE[difficulty]) {
+                    localStorage.setItem((difficulty), BESTSCORE[difficulty]);
+                }
+                changePregame(pregameState + 2);
+            }
             let temp = usedCards.slice();
             temp.push(card);
             updateUsedCards(temp);
         }
         else {
-            setLost(true);
+            if ((localStorage.getItem(difficulty) || 0) < BESTSCORE[difficulty]) {
+                localStorage.setItem((difficulty), BESTSCORE[difficulty]);
+            }
+            changePregame(pregameState + 1);
             console.log("ggs");
         }
     }
 
 
-    if (!lost) {
-        return (
-            <>
-            <Controls score={score} difficulty={difficulty} />
-            <div className="gameboard ">
-                <CardSet type={gameState} renderCards={cardState} clickFunc={clickFunc} difficulty={difficulty} />
-                <div className="mainScore">{score} / {CARDS.length}</div>
-            </div>
-            </>
-        );
-    } else {
-        return (<>
-            <Controls score={score} difficulty={difficulty} />
-            <LossScreen />
-        </>);
-    }
+    return (
+        <>
+        <Controls score={score} difficulty={difficulty} />
+        <div className="gameboard ">
+            <CardSet type={gameState} renderCards={cardState} clickFunc={clickFunc} difficulty={difficulty} />
+            <div className="mainScore">{score + 1} / {CARDS.length}</div>
+        </div>
+        </>
+    );
 }
 
 function Controls({score, difficulty}) { // Score and Best score
@@ -355,14 +388,10 @@ function Controls({score, difficulty}) { // Score and Best score
     </div>);
 }
 
-function LossScreen() {
-    return (<Fulltext text={"You Lost!"}/>);
-}
-
-function IntermissionCard() {
-    return (
-        <div className="cardHolder"><div className="card" onMouseMove={cardHover} onMouseLeave={cardReset}></div></div>
-    );
+function updateBest(score, difficulty) {
+    if (score > BESTSCORE[difficulty]) {
+        BESTSCORE[difficulty] = score;
+    }
 }
 
 function CardSet({type, renderCards, clickFunc}) {
