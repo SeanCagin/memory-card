@@ -7,6 +7,8 @@ import starlightSound from "/starlight.mp3"
 import partySound from "/party-tonight.mp3"
 import summerSound from "/summertime.mp3"
 import synthSound from "/synth.mp3"
+import soundImg from "/sound.png"
+import muteImg from "/mute.png"
 import "./styles.css";
 
 const GAMESTATES = {
@@ -91,16 +93,29 @@ function diffToCardset(difficulty) {
 }
 
 function Page() {
-    const [opening] = useSound(openingSound);
-    const [tick] = useSound(tickSound);
-    const [starlightSoundObj] = useSound(starlightSound, { volume: 0.1, interrupt: true, loop: true});
-    const [partySoundObj] = useSound(partySound, { volume: 0.05, interrupt: true, loop: true });
-    const [summerSoundObj] = useSound(summerSound, { volume: 0.1, interrupt: true, loop: true });
-    const [synthSoundObj] = useSound(synthSound, { volume: 0.1, interrupt: true, loop: true });
+    const [opening, {sound: openingSettings}] = useSound(openingSound);
+    const [tick, {sound: tickSettings}] = useSound(tickSound);
+    const [starlightSoundObj, {sound: starlightSoundSettings}] = useSound(starlightSound, { volume: 0.1, interrupt: true, loop: true});
+    const [partySoundObj, {sound: partySoundSettings}] = useSound(partySound, { volume: 0.05, interrupt: true, loop: true });
+    const [summerSoundObj, {sound: summerSoundSettings}] = useSound(summerSound, { volume: 0.1, interrupt: true, loop: true });
+    const [synthSoundObj, {sound: synthSoundSettings}] = useSound(synthSound, { volume: 0.1, interrupt: true, loop: true });
     const [pregameState, changePregame] = useState(0);
     const [difficulty, changeDifficulty] = useState(MODES.EASY);
     const [cardCount, changeCardCount] = useState(4);
     const [intState, setIntState] = useState(false);
+    const [isMute, setMute] = useState(false);
+
+
+
+
+    useEffect(() => {
+        const soundArr = [[openingSettings, 1], [tickSettings, 1], [starlightSoundSettings, 0.1], [partySoundSettings, 0.05], [summerSoundSettings, 0.1], [synthSoundSettings, 0.1]];
+        soundArr.forEach(([soundObj, volume]) => {
+          if (soundObj) {
+            soundObj.volume(isMute ? 0 : volume);
+          }
+        });
+      }, [isMute, openingSettings, tickSettings, starlightSoundSettings, partySoundSettings, summerSoundSettings, synthSoundSettings]);
 
     useEffect(() => {
         if (pregameState == 1) {
@@ -117,24 +132,44 @@ function Page() {
         }
     }, [pregameState]);
     if (pregameState == 0) {
-        return <StartScreen pregameState={pregameState} changePregame={changePregame} />;
+        return (<>
+            <StartScreen pregameState={pregameState} changePregame={changePregame} />;
+            <Mute isMute={isMute} setMute={setMute} />
+        </>);
     } else if (pregameState == 1) {
-        return (<RulesScreen text={`Don't click the same card twice`} />);
+        return (<>
+            <RulesScreen text={`Don't click the same card twice`} />
+            <Mute isMute={isMute} setMute={setMute} />
+        </>);
     } else if (pregameState == 2) {
-        return <ChooseDifficulty changeDifficulty={changeDifficulty} changePregame={changePregame} pregameState={pregameState} on={!intState} />;
+        return (<>
+            <ChooseDifficulty changeDifficulty={changeDifficulty} changePregame={changePregame} pregameState={pregameState} on={!intState} />
+            <Mute isMute={isMute} setMute={setMute} />
+        </>);
     } else if (pregameState == 3) { 
-        return <ChooseCardCount changeCardCount={changeCardCount} changePregame={changePregame} pregameState={pregameState} on={!intState} />;
+        return (<>
+            <ChooseCardCount changeCardCount={changeCardCount} changePregame={changePregame} pregameState={pregameState} on={!intState} />
+            <Mute isMute={isMute} setMute={setMute} />
+        </>);
     } /* else if (pregameState == 2) {
         return <div></div>;
     } */
-    return (<Game 
-        difficulty={difficulty} 
-        numCardsShown={cardCount} 
-        easySong={summerSoundObj} 
-        mediumSong={partySoundObj} 
-        hardSong={starlightSoundObj}
-        impossibleSong={synthSoundObj}
-        clickSound={tick} />);
+    return (<><Game 
+            difficulty={difficulty} 
+            numCardsShown={cardCount} 
+            easySong={summerSoundObj} 
+            mediumSong={partySoundObj} 
+            hardSong={starlightSoundObj}
+            impossibleSong={synthSoundObj}
+            clickSound={tick} />
+        <Mute isMute={isMute} setMute={setMute} />
+        </>)
+}
+
+function Mute({isMute, setMute}) {
+    return (<div className="mute">
+        <img src={isMute ? muteImg : soundImg} className="soundImg" onClick={() => {setMute(!isMute)}} />
+    </div>);
 }
 
 function StartScreen({changePregame, pregameState}) {

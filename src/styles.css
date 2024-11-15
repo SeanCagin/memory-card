@@ -219,6 +219,22 @@ table {
   font-size: 120px;
 }
 
+.mute {
+  position: fixed;
+  top: 35px;
+  left: 65px;
+}
+
+.mute:hover {
+  cursor: pointer;
+  user-select: none;
+}
+
+.soundImg {
+  width: 50px;
+  height: 50px;
+}
+
 @keyframes cardBye {
   from {
     transform: scale(1);
