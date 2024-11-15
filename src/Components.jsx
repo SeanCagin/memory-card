@@ -95,17 +95,17 @@ function diffToCardset(difficulty) {
 function Page() {
     const [opening, {sound: openingSettings, stop: stopOpening}] = useSound(openingSound);
     const [tick, {sound: tickSettings, stop: stopTick}] = useSound(tickSound);
-    const [starlightSoundObj, {sound: starlightSoundSettings, stop: stopStarlight}] = useSound(starlightSound, { volume: 0.1, interrupt: true, loop: true});
-    const [partySoundObj, {sound: partySoundSettings, stop: stopParty}] = useSound(partySound, { volume: 0.05, interrupt: true, loop: true });
-    const [summerSoundObj, {sound: summerSoundSettings, stop: stopSummer}] = useSound(summerSound, { volume: 0.1, interrupt: true, loop: true });
-    const [synthSoundObj, {sound: synthSoundSettings, stop: stopSynth}] = useSound(synthSound, { volume: 0.1, interrupt: true, loop: true });
+    const [starlightSoundObj, {sound: starlightSoundSettings, stop: stopStarlight}] = useSound(starlightSound, { volume: 0.2, interrupt: true, loop: true});
+    const [partySoundObj, {sound: partySoundSettings, stop: stopParty}] = useSound(partySound, { volume: 0.1, interrupt: true, loop: true });
+    const [summerSoundObj, {sound: summerSoundSettings, stop: stopSummer}] = useSound(summerSound, { volume: 0.2, interrupt: true, loop: true });
+    const [synthSoundObj, {sound: synthSoundSettings, stop: stopSynth}] = useSound(synthSound, { volume: 0.2, interrupt: true, loop: true });
     const [pregameState, changePregame] = useState(0);
     const [difficulty, changeDifficulty] = useState(MODES.EASY);
     const [cardCount, changeCardCount] = useState(4);
     const [intState, setIntState] = useState(false);
     const [isMute, setMute] = useState((localStorage.getItem("mute") == "true") || 0);
     useEffect(() => {
-        const soundArr = [[openingSettings, 1], [tickSettings, 1], [starlightSoundSettings, 0.1], [partySoundSettings, 0.05], [summerSoundSettings, 0.1], [synthSoundSettings, 0.1]];
+        const soundArr = [[openingSettings, 1], [tickSettings, 1], [starlightSoundSettings, 0.2], [partySoundSettings, 0.1], [summerSoundSettings, 0.2], [synthSoundSettings, 0.2]];
         soundArr.forEach(([soundObj, volume]) => {
           if (soundObj) {
             soundObj.volume(isMute ? 0 : volume);

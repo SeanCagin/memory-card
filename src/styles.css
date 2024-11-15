@@ -62,6 +62,7 @@ table {
 
 * {
   font-family: "regular-font", "handlee", 'Courier New', Courier, monospace;
+  color: white;
 }
 
 :root {
