@@ -36,14 +36,13 @@ function cardHover(e) {
     (100 * (e.clientY - offset.top)) / (offset.bottom - offset.top);
   let strength = (mouseYPercentage - 50) / 50;
   let mousePosition = `${mouseXPercentage}% ${100}%`;
-  console.log(mousePosition);
 
   root.style.setProperty("--mouse-position", mousePosition);
   root.style.setProperty("--strength", strength);
   e.currentTarget.style.transition = "transform 0.2s ease-out";
   e.currentTarget.style.transformOrigin = "50% 50%";
-  e.currentTarget.style.transform = `rotateX(${mouseY * 0.1}deg)
-  rotateY(${mouseX * -0.1}deg) scale(1.1)`;
+  e.currentTarget.style.transform = `rotateX(${mouseY * 0.15}deg)
+  rotateY(${mouseX * -0.15}deg) scale(1.1)`;
   e.currentTarget.parentNode.style.perspective = "1600px";
 }
 
@@ -51,4 +50,5 @@ function cardReset(e) {
   e.currentTarget.style.transition = "transform 0.5s ease-out";
   e.currentTarget.style.transform = "";
 }
+
 export { getRandomElement, shuffle, cardHover, cardReset };

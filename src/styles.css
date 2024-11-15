@@ -3,6 +3,19 @@
    v2.0 | 20110126
    License: none (public domain)
 */
+@font-face {
+  font-family: 'regular-font';
+  src: url('../public/regular-font.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'handlee';
+  src: url('../public/Handlee/Handlee-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
 
 html, body, div, span, applet, object, iframe,
 h1, h2, h3, h4, h5, h6, p, blockquote, pre,
@@ -21,7 +34,6 @@ time, mark, audio, video {
 	padding: 0;
 	border: 0;
 	font-size: 100%;
-	font: inherit;
 	vertical-align: baseline;
 }
 /* HTML5 display-role reset for older browsers */
@@ -48,10 +60,18 @@ table {
 	border-spacing: 0;
 }
 
+* {
+  font-family: "regular-font", "handlee", 'Courier New', Courier, monospace;
+}
+
 :root {
-  background-image: url("../public/the_park.webp");
+  background-image: url("../public/background.jpg");
   --mouse-position: 0 0;
   --strength: 0;
+}
+
+#root {
+  width: 100vw;
 }
 
 .page {
@@ -67,11 +87,12 @@ table {
 }
 
 .card {
+  color: white;
   position: relative;
   padding: 0.1px; /*prevents margin collapsing*/
-  width: 270px;
-  height: 370px;
-  background-image: url("../public/background.jpg");
+  width: 200px;
+  height: 300px;
+  background-image: url("../public/card2.jpg");
   background-size: cover;
   border-radius: 10px;
 }
@@ -93,8 +114,8 @@ table {
 
 .gifHolder {
   margin: 10px auto;
-  width: 250px;
-  height: 320px;
+  width: 180px;
+  height: 250px;
 }
 
 .cardImg {
@@ -117,5 +138,95 @@ table {
 .score {
   position: fixed;
   top: 35px;
-  right: 35px;
+  right: 65px;
+}
+
+.score * {
+  font-size: 32px;
+}
+
+.fulltext {
+  color: white;
+  font-weight: bolder;
+  font-size: 72px;
+  display: block;
+  width: 100vw;
+  text-align: center;
+}
+
+.gameboard {
+  display: flex;
+  flex-direction: column;
+  row-gap: 50px;
+  align-items: center;
+  justify-content: center;
+}
+
+.mainScore {
+  font-weight: bolder;
+  font-size: 32px;
+}
+
+.cardList.flip {
+  animation: cardBye 0.5s ease-in forwards;
+}
+
+.cardList {
+  animation: cardBye 0.5s ease-in reverse;
+}
+
+.settingsHeader {
+  font-size: 72px;
+  user-select: none;
+}
+
+.settingOpts {
+  height: 100px;
+  display: flex;
+  column-gap: 50px;
+  align-items: center;
+  justify-content: center;
+}
+
+.settingOpt {
+  width: 200px;
+  font-size: 50px;
+  text-align: center;
+}
+
+.settingOpt:hover {
+  cursor: pointer;
+  font-size: 60px;
+}
+
+.settings {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  row-gap: 50px;
+}
+
+.start {
+  display: flex;
+  justify-content: center;
+  width: 100vw;
+  font-size: 100px;
+  user-select: none;
+}
+
+.startText:hover {
+  cursor: pointer;
+  font-size: 120px;
+}
+
+@keyframes cardBye {
+  from {
+    transform: scale(1);
+  }
+  35% {
+    transform: scale(1.2);
+  }
+  to {
+    transform: scale(0);
+  }
 }
