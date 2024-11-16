@@ -7,6 +7,7 @@ import starlightSound from "/starlight.mp3"
 import partySound from "/party-tonight.mp3"
 import summerSound from "/summertime.mp3"
 import synthSound from "/synth.mp3"
+import evilSound from "/evil.mp3"
 import soundImg from "/sound.png"
 import muteImg from "/mute.png"
 import "./styles.css";
@@ -25,8 +26,6 @@ const MODES = {
     GODLIKE: 4,
 }
 
-let godlike_on = localStorage.getItem("???") || 0;
-// let godlike_on = "true";
 
 const BESTSCORE = {
     [MODES["EASY"]]: localStorage.getItem(MODES["EASY"]) || 0,
@@ -127,27 +126,31 @@ function diffToCardset(difficulty) {
 function Page() {
     const [opening, {sound: openingSettings, stop: stopOpening}] = useSound(openingSound);
     const [tick, {sound: tickSettings, stop: stopTick}] = useSound(tickSound);
-    const [starlightSoundObj, {sound: starlightSoundSettings, stop: stopStarlight}] = useSound(starlightSound, { volume: 0.2, interrupt: true, loop: true});
-    const [partySoundObj, {sound: partySoundSettings, stop: stopParty}] = useSound(partySound, { volume: 0.1, interrupt: true, loop: true });
-    const [summerSoundObj, {sound: summerSoundSettings, stop: stopSummer}] = useSound(summerSound, { volume: 0.2, interrupt: true, loop: true });
-    const [synthSoundObj, {sound: synthSoundSettings, stop: stopSynth}] = useSound(synthSound, { volume: 0.2, interrupt: true, loop: true });
-    // const [synthSoundObj, {sound: synthSoundSettings, stop: stopSynth}] = useSound(synthSound, { volume: 0.2, interrupt: true, loop: true });
+    const [starlightSoundObj, {sound: starlightSoundSettings, stop: stopStarlight}] = useSound(starlightSound, { volume: 0.4, interrupt: true, loop: true});
+    const [partySoundObj, {sound: partySoundSettings, stop: stopParty}] = useSound(partySound, { volume: 0.2, interrupt: true, loop: true });
+    const [summerSoundObj, {sound: summerSoundSettings, stop: stopSummer}] = useSound(summerSound, { volume: 0.4, interrupt: true, loop: true });
+    const [synthSoundObj, {sound: synthSoundSettings, stop: stopSynth}] = useSound(synthSound, { volume: 0.4, interrupt: true, loop: true });
+    const [godlikeSoundObj, {sound: godlikeSoundSettings, stop: stopGodlike}] = useSound(evilSound, { volume: 0.6, interrupt: true, loop: true });
+    const [godlikeOn, setGodlike] = useState(localStorage.getItem("???") || 0);
     const [pregameState, changePregame] = useState(0);
     const [difficulty, changeDifficulty] = useState(MODES.EASY);
     const [cardCount, changeCardCount] = useState(4);
     const [intState, setIntState] = useState(false);
     const [isMute, setMute] = useState((localStorage.getItem("mute") == "true") || 0);
+    const sounds = {hardSong: starlightSoundObj, mediumSong: partySoundObj, easySong: summerSoundObj, impossibleSong: synthSoundObj, godlikeSong: godlikeSoundObj, tick};
+
+    
     useEffect(() => {
-        const soundArr = [[openingSettings, 1], [tickSettings, 1], [starlightSoundSettings, 0.2], [partySoundSettings, 0.1], [summerSoundSettings, 0.2], [synthSoundSettings, 0.2]];
+        const soundArr = [[openingSettings, 1], [tickSettings, 1], [starlightSoundSettings, 0.4], [partySoundSettings, 0.2], [summerSoundSettings, 0.4], [synthSoundSettings, 0.4], [godlikeSoundSettings, 0.6]];
         soundArr.forEach(([soundObj, volume]) => {
           if (soundObj) {
             soundObj.volume(isMute ? 0 : volume);
           }
         });
-    }, [isMute, openingSettings, tickSettings, starlightSoundSettings, partySoundSettings, summerSoundSettings, synthSoundSettings]);
+    }, [isMute, openingSettings, tickSettings, starlightSoundSettings, partySoundSettings, summerSoundSettings, synthSoundSettings, godlikeSoundSettings]);
 
     function muteAllSounds() {
-        const stopArr = [stopOpening, stopTick, stopStarlight, stopSummer, stopParty, stopSynth];
+        const stopArr = [stopOpening, stopTick, stopStarlight, stopSummer, stopParty, stopSynth, stopGodlike];
         stopArr.forEach((stop) => {
             stop();
         });
@@ -165,6 +168,17 @@ function Page() {
                 setIntState(false);
             }, 200);
             tick();
+        } 
+        if (pregameState == 4 && difficulty == MODES["GODLIKE"]) {
+            let root = document.querySelector(":root");
+            if(root.style.getPropertyValue("--alternative-background") != "var(--alternative-background)") {
+                root.style.setProperty("background", "var(--alternative-background)");
+            }
+        } else {
+            let root = document.querySelector(":root");
+            if(root.style.getPropertyValue("--alternative-background") != "var(--background)") {
+                root.style.setProperty("background", "var(--background)");
+            }
         }
     }, [pregameState]);
     if (pregameState == 0) {
@@ -179,7 +193,7 @@ function Page() {
         </>);
     } else if (pregameState == 2) {
         return (<>
-            <ChooseDifficulty changeDifficulty={changeDifficulty} changePregame={changePregame} pregameState={pregameState} on={!intState} />
+            <ChooseDifficulty changeDifficulty={changeDifficulty} changePregame={changePregame} pregameState={pregameState} on={!intState} godlikeOn={godlikeOn}/>
             <Mute isMute={isMute} setMute={setMute} tick={tick} />
         </>);
     } else if (pregameState == 3) { 
@@ -191,28 +205,26 @@ function Page() {
         return (<><Game 
             difficulty={difficulty} 
             numCardsShown={cardCount} 
-            easySong={summerSoundObj} 
-            mediumSong={partySoundObj} 
-            hardSong={starlightSoundObj}
-            impossibleSong={synthSoundObj}
-            godlikeSong={synthSoundObj}
-            clickSound={tick}
+            sounds={sounds}
             changePregame={changePregame}
             pregameState={pregameState} />
         <Mute isMute={isMute} setMute={setMute} tick={tick} />
         </>)
     } else if (pregameState == 5) {
-        return (<><EndScreen text={`YOU'RE FIRED!`} muteFunc={muteAllSounds} changePregame={changePregame} tick={tick} />
+        return (<><EndScreen text={`YOU'RE FIRED!`} muteFunc={muteAllSounds} changePregame={changePregame} tick={tick} setGodlike={setGodlike} godlikeVal={godlikeOn} />
             <Mute isMute={isMute} setMute={setMute} tick={tick} /></>
         );
     } else if (pregameState == 6) {
         let nodeText = `Wooooooooooooooaaaaaaaaaaaaah`;
-        if ((difficulty == MODES["EASY"]) && !godlike_on) {
-            nodeText = `New Difficulty Unlocked`;
-            godlike_on = 1;
-            localStorage.setItem("???", godlike_on);
+        let godlikeVal = godlikeOn;
+        if ((difficulty == MODES["IMPOSSIBLE"]) && (godlikeOn == 0)) {
+            nodeText = `NEW DIFFICULTY UNLOCKED`;
+            localStorage.setItem("???", godlikeOn);
+            godlikeVal = 1;
+        } else if (difficulty == MODES["GODLIKE"]) {
+            nodeText = `Once you do the hard stuff, it becomes not that hard.`;
         }
-        return (<><EndScreen text={nodeText} muteFunc={muteAllSounds} changePregame={changePregame} tick={tick} />
+        return (<><EndScreen text={nodeText} muteFunc={muteAllSounds} changePregame={changePregame} tick={tick} setGodlike={setGodlike} godlikeVal={godlikeVal} />
             <Mute isMute={isMute} setMute={setMute} tick={tick} /></>
         );
     }
@@ -237,8 +249,9 @@ function StartScreen({changePregame, pregameState}) {
         </div>);
 }
 
-function EndScreen({text, changePregame, muteFunc, tick}) {
+function EndScreen({text, changePregame, muteFunc, tick, setGodlike, godlikeVal}) {
     function updateGame(state) {
+        setGodlike(godlikeVal);
         if (state == 0) {
             setTimeout(tick, 100);
         }
@@ -259,15 +272,14 @@ function RulesScreen({text}) {
     return (<div className="settings"><div className="settingsHeader">{text}</div></div>);
 }
 
-function ChooseDifficulty({changeDifficulty, changePregame, pregameState, on}) {
+function ChooseDifficulty({changeDifficulty, changePregame, pregameState, on, godlikeOn}) { // on checks if we are in an intermission state or not
     function chooseMode(mode) {
         if (on) {
             changeDifficulty(mode);
             changePregame(pregameState + 1);
         }
     }
-    let lastNode = (godlike_on == 1) ? <div className="settingOpt godlike"  onClick={() => chooseMode(MODES.GODLIKE)}>???</div> : <></>;
-    // let lastNode =  <div className="settingOpt godlike"  onClick={() => chooseMode(MODES.GODLIKE)}>???</div>;
+    let lastNode = (godlikeOn == 1) ? <div className="settingOpt godlike"  onClick={() => chooseMode(MODES.GODLIKE)}>???</div> : <></>;
     return (
         <div className="settings">
             <h1 className="settingsHeader">Difficulty</h1>
@@ -302,7 +314,7 @@ function ChooseCardCount({changeCardCount, changePregame, pregameState, on}) {
 }
 
 
-function Game({CARDS, difficulty, numCardsShown, easySong, mediumSong, hardSong, impossibleSong, godlikeSong, clickSound, changePregame, pregameState}) {
+function Game({CARDS, difficulty, numCardsShown, sounds, changePregame, pregameState}) {
     const [loading, setLoading] = useState(true);
     useEffect(() => {
         async function loadImages() {
@@ -330,15 +342,15 @@ function Game({CARDS, difficulty, numCardsShown, easySong, mediumSong, hardSong,
     useEffect(() => {
         if (!loading) {
             if (difficulty == MODES.EASY) {
-                easySong();
+                sounds.easySong();
             } else if (difficulty == MODES.NORMAL) {
-                mediumSong();
+                sounds.mediumSong();
             } else if (difficulty == MODES.HARD) {
-                hardSong();
+                sounds.hardSong();
             } else if (difficulty == MODES.IMPOSSIBLE) {
-                impossibleSong();
+                sounds.impossibleSong();
             } else {
-                godlikeSong();
+                sounds.godlikeSong();
             }
         }
     }, [loading]);
@@ -347,7 +359,7 @@ function Game({CARDS, difficulty, numCardsShown, easySong, mediumSong, hardSong,
     if (!loading) {
         return (
             <div className="page">
-                <Gameboard CARDS={CARDS} numCardsShown={numCardsShown} difficulty={difficulty} clickSound={clickSound} changePregame={changePregame} pregameState={pregameState}/>
+                <Gameboard CARDS={CARDS} numCardsShown={numCardsShown} difficulty={difficulty} clickSound={sounds.tick} changePregame={changePregame} pregameState={pregameState}/>
             </div>
         );
     } else {
