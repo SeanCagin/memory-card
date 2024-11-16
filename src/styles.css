@@ -236,6 +236,10 @@ table {
   height: 50px;
 }
 
+.godlike {
+  color: darkred;
+}
+
 @keyframes cardBye {
   from {
     transform: scale(1);

@@ -22,13 +22,18 @@ const MODES = {
     NORMAL: 1,
     HARD: 2,
     IMPOSSIBLE: 3,
+    GODLIKE: 4,
 }
+
+let godlike_on = localStorage.getItem("???") || 0;
+// let godlike_on = "true";
 
 const BESTSCORE = {
     [MODES["EASY"]]: localStorage.getItem(MODES["EASY"]) || 0,
     [MODES["NORMAL"]]: localStorage.getItem(MODES["NORMAL"]) || 0,
     [MODES["HARD"]]: localStorage.getItem(MODES["HARD"]) || 0,
     [MODES["IMPOSSIBLE"]]: localStorage.getItem(MODES["IMPOSSIBLE"]) || 0,
+    [MODES["GODLIKE"]]: localStorage.getItem(MODES["IMPOSSIBLE"]) || 0,
 }
 
 const SRCMAP = {};
@@ -42,33 +47,59 @@ const CHARACTERS = {
     "Pops": "https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExaDIwNTdyNzY4c3lxNTFrbWkxeTA1bDB3YndzMXk0N3Zpb2FwMzNkbSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/iZ0pJCIN1el8Y/giphy.webp",
     "Margaret": "https://media1.tenor.com/m/AoOIvlfj6lYAAAAd/tengo-tanto-que-contarte-margarita.gif",
     "Eileen": "https://media1.tenor.com/m/HLQkXAofwcwAAAAd/there-there-soothe.gif",
+
     "Skips": "https://media1.tenor.com/m/_MxYn__0gbEAAAAC/regular-show-skips.gif",
     "Thomas": "https://media1.tenor.com/m/ejW5QVz8Un8AAAAd/regular-show.gif",
     "Fives": "https://media1.tenor.com/m/1276GVEXs84AAAAd/high-five-ghost-regular-show.gif",
     "Don": "https://media1.tenor.com/m/OaMQPLExzrMAAAAd/regularshow-hug.gif",
+
     "Anti Pops": "https://media1.tenor.com/m/E4LLHy0FCBoAAAAd/anti-pops-evil.gif",
     "Celia": "https://media1.tenor.com/m/adpKYpSoH5AAAAAd/girar-fantasmin.gif",
     "Mr. Maellard": "https://media1.tenor.com/m/nfOPbIZ4p3MAAAAd/wipe-tears-mr-maellard.gif",
     "Starla": "https://media1.tenor.com/m/pmP8DAGjfCUAAAAC/starla-on-the-glass-regular-show.gif",
+
     "Gary": "https://media1.tenor.com/m/EePFAMcNrO0AAAAd/regular-show-gary-regular-show.gif",
     "Babies": "https://media1.tenor.com/m/HEr7kmeYi5wAAAAd/regular-show.gif",
     "GBF": "https://media1.tenor.com/m/N2ncytySZLQAAAAd/regularshow-gbf.gif",
     "Death": "https://media1.tenor.com/m/I-_tWOPip4gAAAAC/death-skips.gif",
+
+    "DVD Dude": "https://media1.tenor.com/m/KOPB2RXssLYAAAAd/cool-sunglasses.gif",
+    "Apple Sauce": "https://media1.tenor.com/m/Q-9V8GHT9oMAAAAd/hug-benson-dunwoody.gif",
+    "Coffee Coffee": "https://media1.tenor.com/m/eEl37I8w2asAAAAd/coffee-coffeebean.gif",
+    "Father time": "https://media1.tenor.com/m/2LiDaWxExGMAAAAd/s%C3%BCrekli-dizi-regular-show.gif",
+    "Baby Ducks": "https://media1.tenor.com/m/SjGGNgYRm6YAAAAC/duck-karate-chop-regular-show.gif",
+    "God of Basketball": "https://media1.tenor.com/m/6zGtivq3CBQAAAAd/regular-show-basketball-king.gif",
+    "British Taxi": "https://media1.tenor.com/m/E0f0Xxxsn7kAAAAd/ello-govnar.gif",
+    "Cart": "https://media1.tenor.com/m/ylUO59RfsPoAAAAd/screaming-mordecai.gif",
+    "Party Horse": "https://media1.tenor.com/m/lyL0AYn5vIAAAAAC/head-bob-yeah.gif",
+    "Chance Sureshot": "https://media1.tenor.com/m/FmZf3-02GZcAAAAd/gun-trick-gun.gif",
+    "CJ": "https://media1.tenor.com/m/H0vNEZBinFYAAAAC/regular-show-cj.gif",
+    "Video Guy": "https://media1.tenor.com/m/YkAPG8PlrpsAAAAd/the-regular-show-all-day.gif",
+    "David": "https://media1.tenor.com/m/_NWNXa21ivUAAAAd/regular-show.gif",
+    "Sensai": "https://media1.tenor.com/m/zP-Ytvb-2zcAAAAC/no-noo.gif",
+    "Techmo": "https://media1.tenor.com/m/KwPYVVWL-VgAAAAd/regular-show-technology.gif",
+    "Eggscelent Knight": "https://media1.tenor.com/m/M6NhTdS2yT0AAAAd/regular-show-farewell.gif",
+    "Geese": "https://media1.tenor.com/m/2naYVC_BldoAAAAd/mordecai-sandwich.gif",
+    "Gene": "https://media1.tenor.com/m/fNR6bnpYJiIAAAAC/regular-show-gene-gene.gif",
+    "Earl": "https://media1.tenor.com/m/2euDRBWZ3YkAAAAd/twitch-evil-eye.gif",
+    "Hot Dogs": "https://media1.tenor.com/m/iSUj-CPxd1UAAAAd/out-self-eat.gif",
 }
 
 const EASY = 8;
 const NORMAL = 12;
 const HARD = 16;
+const IMPOSSIBLE = 20;
 
-const CARDS_IMPOSSIBLE = [];
+const CARDS_GOD = [];
 
 for (let key in CHARACTERS) {
-    CARDS_IMPOSSIBLE.push(key);
+    CARDS_GOD.push(key);
 }
 
-const CARDS_EASY = CARDS_IMPOSSIBLE.slice(0, EASY);
-const CARDS_NORMAL = CARDS_IMPOSSIBLE.slice(0, NORMAL);
-const CARDS_HARD = CARDS_IMPOSSIBLE.slice(0, HARD);
+const CARDS_EASY = CARDS_GOD.slice(0, EASY);
+const CARDS_NORMAL = CARDS_GOD.slice(0, NORMAL);
+const CARDS_HARD = CARDS_GOD.slice(0, HARD);
+const CARDS_IMPOSSIBLE = CARDS_GOD.slice(0, IMPOSSIBLE);
 
 
 
@@ -89,6 +120,7 @@ function diffToCardset(difficulty) {
         case MODES.NORMAL: return CARDS_NORMAL;
         case MODES.HARD: return CARDS_HARD;
         case MODES.IMPOSSIBLE: return CARDS_IMPOSSIBLE;
+        case MODES.GODLIKE: return CARDS_GOD;
     }
 }
 
@@ -99,6 +131,7 @@ function Page() {
     const [partySoundObj, {sound: partySoundSettings, stop: stopParty}] = useSound(partySound, { volume: 0.1, interrupt: true, loop: true });
     const [summerSoundObj, {sound: summerSoundSettings, stop: stopSummer}] = useSound(summerSound, { volume: 0.2, interrupt: true, loop: true });
     const [synthSoundObj, {sound: synthSoundSettings, stop: stopSynth}] = useSound(synthSound, { volume: 0.2, interrupt: true, loop: true });
+    // const [synthSoundObj, {sound: synthSoundSettings, stop: stopSynth}] = useSound(synthSound, { volume: 0.2, interrupt: true, loop: true });
     const [pregameState, changePregame] = useState(0);
     const [difficulty, changeDifficulty] = useState(MODES.EASY);
     const [cardCount, changeCardCount] = useState(4);
@@ -162,6 +195,7 @@ function Page() {
             mediumSong={partySoundObj} 
             hardSong={starlightSoundObj}
             impossibleSong={synthSoundObj}
+            godlikeSong={synthSoundObj}
             clickSound={tick}
             changePregame={changePregame}
             pregameState={pregameState} />
@@ -172,7 +206,13 @@ function Page() {
             <Mute isMute={isMute} setMute={setMute} tick={tick} /></>
         );
     } else if (pregameState == 6) {
-        return (<><EndScreen text={`Wooooooooooooooaaaaaaaaaaaaah!`} muteFunc={muteAllSounds} changePregame={changePregame} tick={tick} />
+        let nodeText = `Wooooooooooooooaaaaaaaaaaaaah`;
+        if ((difficulty == MODES["EASY"]) && !godlike_on) {
+            nodeText = `New Difficulty Unlocked`;
+            godlike_on = 1;
+            localStorage.setItem("???", godlike_on);
+        }
+        return (<><EndScreen text={nodeText} muteFunc={muteAllSounds} changePregame={changePregame} tick={tick} />
             <Mute isMute={isMute} setMute={setMute} tick={tick} /></>
         );
     }
@@ -226,6 +266,8 @@ function ChooseDifficulty({changeDifficulty, changePregame, pregameState, on}) {
             changePregame(pregameState + 1);
         }
     }
+    let lastNode = (godlike_on == 1) ? <div className="settingOpt godlike"  onClick={() => chooseMode(MODES.GODLIKE)}>???</div> : <></>;
+    // let lastNode =  <div className="settingOpt godlike"  onClick={() => chooseMode(MODES.GODLIKE)}>???</div>;
     return (
         <div className="settings">
             <h1 className="settingsHeader">Difficulty</h1>
@@ -234,6 +276,7 @@ function ChooseDifficulty({changeDifficulty, changePregame, pregameState, on}) {
                 <div className="settingOpt"  onClick={() => chooseMode(MODES.NORMAL)}>Medium</div>
                 <div className="settingOpt"  onClick={() => chooseMode(MODES.HARD)}>Hard</div>
                 <div className="settingOpt"  onClick={() => chooseMode(MODES.IMPOSSIBLE)}>Impossible</div>
+                {lastNode}
             </div>
         </div>);
 }
@@ -259,7 +302,7 @@ function ChooseCardCount({changeCardCount, changePregame, pregameState, on}) {
 }
 
 
-function Game({CARDS, difficulty, numCardsShown, easySong, mediumSong, hardSong, impossibleSong, clickSound, changePregame, pregameState}) {
+function Game({CARDS, difficulty, numCardsShown, easySong, mediumSong, hardSong, impossibleSong, godlikeSong, clickSound, changePregame, pregameState}) {
     const [loading, setLoading] = useState(true);
     useEffect(() => {
         async function loadImages() {
@@ -292,8 +335,10 @@ function Game({CARDS, difficulty, numCardsShown, easySong, mediumSong, hardSong,
                 mediumSong();
             } else if (difficulty == MODES.HARD) {
                 hardSong();
-            } else {
+            } else if (difficulty == MODES.IMPOSSIBLE) {
                 impossibleSong();
+            } else {
+                godlikeSong();
             }
         }
     }, [loading]);
