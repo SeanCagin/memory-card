@@ -32,7 +32,7 @@ const BESTSCORE = {
     [MODES["NORMAL"]]: localStorage.getItem(MODES["NORMAL"]) || 0,
     [MODES["HARD"]]: localStorage.getItem(MODES["HARD"]) || 0,
     [MODES["IMPOSSIBLE"]]: localStorage.getItem(MODES["IMPOSSIBLE"]) || 0,
-    [MODES["GODLIKE"]]: localStorage.getItem(MODES["IMPOSSIBLE"]) || 0,
+    [MODES["GODLIKE"]]: localStorage.getItem(MODES["GODLIKE"]) || 0,
 }
 
 const SRCMAP = {};
